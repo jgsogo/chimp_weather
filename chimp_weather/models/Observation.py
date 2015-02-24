@@ -16,8 +16,8 @@ class ObservationManager(models.Manager):
 
 class Observation(models.Model):
     # place
-    latitude = models.FloatField()
     longitude = models.FloatField()
+    latitude = models.FloatField()
 
     # current vs forecast
     #_time = models.IntegerField(help_text=_(u'The UNIX time (that is, seconds since midnight GMT on 1 Jan 1970) at which this data point occurs'))
@@ -26,7 +26,7 @@ class Observation(models.Model):
     _non_forecast = models.BooleanField()
 
     # data-point
-    temperature = models.FloatField(_('temperature (ºC)'), default=0)
+    temperature = models.FloatField(_(u'temperature (ºC)'), default=0)
     ozone = models.FloatField(blank=True, null=True)
     apparent_temperature = models.FloatField(blank=True, null=True)
     dew_point = models.FloatField(blank=True, null=True)
@@ -39,16 +39,16 @@ class Observation(models.Model):
     precip_probability = models.FloatField(blank=True, null=True)
 
     class Meta:
-        verbose_name = _('observation')
-        verbose_name_plural = _('observations')
-        unique_together = (('latitude', 'longitude', 'time', 'observed'),)
+        verbose_name = _(u'observation')
+        verbose_name_plural = _(u'observations')
+        unique_together = (('longitude', 'latitude', 'time', 'observed'),)
 
     def save(self, *args, **kwargs):
         self._non_forecast = (self.time == self.observed)
         super(Observation, self).save(*args, **kwargs)
 
 # Credit: http://stackoverflow.com/a/10854034
-def roundTime(dt=None, roundTo=60):
+def round_time(dt=None, roundTo=60):
     """Round a datetime object to any time laps in seconds
     dt : datetime.datetime object, default now.
     roundTo : Closest number of seconds to round to, default 1 minute.
@@ -61,24 +61,27 @@ def roundTime(dt=None, roundTo=60):
     return dt + timedelta(0,rounding-seconds,-dt.microsecond)
 
 
-def make_observation(latitude, longitude, time=None):
+def make_observation(longitude, latitude, time=None, api_key=None):
     import os
     import forecastio
-    api_key = os.environ['FORECASTIO_API_KEY']
-    forecast = forecastio.load_forecast(api_key, latitude, longitude)
+    api_key = api_key or os.environ['FORECASTIO_API_KEY']
+    forecast = forecastio.load_forecast(api_key, longitude, latitude)
 
-    now = roundTime(datetime.now(), roundTo=60*60)
+    now = round_time(datetime.now(), roundTo=60*60)
 
-    # TODO: Batch create all this instances.
+    # TODO: Bulk creation of all these instances.
 
     # Hourly observations
     byHour = forecast.hourly()
+    objs = []
     for data in byHour.data:
-        o = Observation(latitude=latitude, longitude=longitude)
+        o = Observation(longitude=longitude, latitude=latitude)
         o.observed = now
         o.time = data.time
+        o._non_forecast = (o.time == o.observed)
         # data-point
-        fields = [('temperature', u'temperature'),
+        fields = [
+                 ('temperature', u'temperature'),
                  ('ozone', u'ozone'),
                  ('apparent_temperature', u'apparentTemperature'),
                  ('dew_point', u'dewPoint'),
@@ -96,5 +99,6 @@ def make_observation(latitude, longitude, time=None):
                 setattr(o, field[0], data.d[field[1]])
             except KeyError as e:
                 log.error(str(e))
+        objs.append(o)
 
-        o.save()
+    Observation.objects.bulk_create(objs)
