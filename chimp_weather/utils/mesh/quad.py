@@ -29,7 +29,6 @@ class QuadGrid(Grid):
         c = -(self.polygon.get_width()*self.polygon.get_height())
         fixed_side = round((-b + math.sqrt(b*b - 4*a*c))/(2.0*a), self.float_digits)
         #side2 = (-b - math.sqrt(b*b - 4*a*c))/2.0
-        log.debug(u"fixed_side = %s" % fixed_side)
 
         x = int(round(self.polygon.get_width()/fixed_side + 1))
         y = int(round(self.polygon.get_height()/fixed_side + 1))
@@ -56,12 +55,12 @@ class QuadGrid(Grid):
         def check_x(x):
             d = int((x - self.polygon.get_min_x())/self.side)
             r = ((x - self.polygon.get_min_x()) - self.side*d)
-            return r <= self.side*self.tolerance
+            return r <= self.side*self.tolerance or abs(r - self.side*self.tolerance) < self.epsilon
 
         def check_y(y):
             d = int((y - self.polygon.get_min_y())/self.side)
             r = ((y - self.polygon.get_min_y()) - self.side*d)
-            return r <= self.side*self.tolerance
+            return r <= self.side*self.tolerance or abs(r - self.side*self.tolerance) < self.epsilon
 
         return check_x(px) and check_y(py)
 
@@ -88,14 +87,102 @@ class QuadGrid(Grid):
                        (x_min, y_min + self.side),]]
         return neighbours
 
+
+import unittest
+import random
+
+
+class QuadGridTestCase(unittest.TestCase):
+    def setUp(self):
+        from chimp_weather.utils.mesh.polygon import Square
+        self.square1 = Square(0, 0, 9, 9)
+
+    def test_init(self):
+        n_vertices = random.randint(4, 1000)
+        n_sets = 2
+        grid = QuadGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=n_sets)
+
+        self.assertEqual(self.square1, grid.polygon)
+        self.assertEqual(n_vertices, grid._n_vertices)
+        self.assertEqual(n_sets, grid.n_sets)
+
+    def test_compute(self):
+        grid = QuadGrid(polygon=self.square1, n_vertices=100, n_sets=2)
+        grid.compute()
+
+        self.assertEqual(grid.nx, 10)
+        self.assertEqual(grid.ny, 10)
+        self.assertEqual(grid.side, 1)
+
+    def test_compute_rand(self):
+        for i in xrange(10):
+            n_vertices = random.randint(4, 1000)
+            grid = QuadGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=2)
+            grid.compute()
+
+            self.assertLessEqual(grid.n_vertices, n_vertices)
+            self.assertLessEqual(grid.coverage, 1)
+
+    def test_grid_vertices(self):
+        grid = QuadGrid(polygon=self.square1, n_vertices=100, n_sets=2)
+        grid.compute()
+
+        # Pertenecen al grid
+        for x in xrange(10):
+            for y in xrange(10):
+                p = (x, y)
+                self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
+
+    def test_non_grid_vertices(self):
+        grid = QuadGrid(polygon=self.square1, n_vertices=100, n_sets=2)
+        grid.compute()
+
+        # No pertenecen al grid
+        for x in xrange(10):
+            for y in xrange(10):
+                p = (x+grid.tolerance*grid.side, y+grid.tolerance*grid.side)
+                self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
+                p = (x+1.1*grid.tolerance, y)
+                self.assertEqual(grid.is_grid_vertex(p[0], p[1]), False, "Failed with point %s" % str(p))
+
+
+    def test_neighbours(self):
+        n_vertices = 100
+        n_sets = 2
+        grid = QuadGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=n_sets)
+        grid.compute()
+
+        for i in xrange(10):
+            p1 = (random.randint(0,10), random.randint(0,10))
+            if grid.is_grid_vertex(p1[0], p1[1]):
+                log.debug("Neighbours for grid vertex %s" % str(p1))
+                neighbours = grid.get_neighbours(p1[0], p1[1])
+                self.assertEqual(len(neighbours), 1)
+                self.assertEqual(sum(len(x) for x in neighbours), 4)
+            else:
+                log.debug("Neighbours for NON grid vertex %s" % str(p1))
+                neighbours = grid.get_neighbours(p1[0], p1[1])
+                self.assertEqual(len(neighbours), 2)
+                self.assertEqual(sum(len(x) for x in neighbours), 4)
+
+            for set in neighbours:
+                for p in set:
+                    log.debug("\tpoint: %s" % str(p))
+                    self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True)
+
+
 if __name__ == "__main__":
     # Configure log
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.ERROR)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(message)s')
     ch.setFormatter(formatter)
     log.addHandler(ch)
+
+    # Run tests
+    unittest.main()
+
 
     # Example - square
     from chimp_weather.utils.mesh.polygon import Square

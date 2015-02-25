@@ -6,6 +6,7 @@ from chimp_weather.utils.mesh.polygon import Polygon
 
 class Grid(object):
     float_digits = 4 # precision (this should be the same as the ones stored in the database
+    epsilon = 0.0
     tolerance = 0.05 # Tolerancia expresada con relación al tamaño del lado
 
     def __init__(self, polygon, n_vertices, n_sets):
@@ -13,6 +14,8 @@ class Grid(object):
         self.polygon = polygon
         self._n_vertices = n_vertices
         self.n_sets = n_sets
+        # Con los decimales que tenemos, este epsilon es despreciable
+        self.epsilon = pow(10, -self.float_digits-1)
 
     def _compute(self):
         raise NotImplementedError()
@@ -61,3 +64,4 @@ class Grid(object):
             else:
                 y = y-1 #TODO: Pensar si es adecuado.
         return x, y
+
