@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+from random import random
 from chimp_weather.utils.mesh.polygon import Polygon
 
 import logging
@@ -39,6 +40,15 @@ def compute_hex_mesh(polygon, n_vertices, fixed_side=None):
 
     x = int(round( (2.0*polygon.get_width()+fixed_side)/(2.0*fixed_side) ))
     y = int(round( (2.0*polygon.get_height() + math.sqrt(3)*fixed_side)/(math.sqrt(3)*fixed_side) ))
+
+    while x*y > n_vertices:
+        if y > x:
+            y = y-1
+        elif x > y:
+            x = x-1
+        else:
+            y = y-1 #TODO: Pensar si es adecuado.
+
     return x, y, fixed_side
 
 
@@ -55,13 +65,15 @@ if __name__ == "__main__":
     from chimp_weather.utils.mesh.polygon import Square
     s1 = Square(0, 0, 5, 1.733*2.)
 
-    nx, ny, side = compute_hex_mesh(s1, 9)
+    nx, ny, side = compute_hex_mesh(s1, 1000)
     print("\tn_x = %s" % nx)
     print("\tn_y = %s" % ny)
+    print("\tn_vertices = %s" % (nx*ny))
     print("\tside = %s" % side)
     coverage = (ny-1)*(nx-1)*side*side*math.sqrt(3)/2.0*100
     print("\tcoverage = %s %%" % (coverage/float(s1.get_area())))
 
+    """
     n_sets = 3
     j = 0
     vertices = [[],[], []]
@@ -82,3 +94,4 @@ if __name__ == "__main__":
         print "\n".join([str(p) for p in set])
         i = i + 1
 
+    """

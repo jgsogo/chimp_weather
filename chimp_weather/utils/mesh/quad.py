@@ -39,6 +39,15 @@ def compute_quad_mesh(polygon, n_vertices, fixed_side=None):
 
     x = int(round(polygon.get_width()/fixed_side + 1))
     y = int(round(polygon.get_height()/fixed_side + 1))
+
+    while x*y > n_vertices:
+        if y > x:
+            y = y-1
+        elif x > y:
+            x = x-1
+        else:
+            y = y-1 #TODO: Pensar si es adecuado.
+
     return x, y, fixed_side
     """
     size_x = fixed_side
@@ -71,13 +80,15 @@ if __name__ == "__main__":
     from chimp_weather.utils.mesh.polygon import Square
     s1 = Square(-5, -5, 20, 10)
 
-    nx, ny, side = compute_quad_mesh(s1, 16)
+    nx, ny, side = compute_quad_mesh(s1, 1000)
     print("\tn_x = %s" % nx)
     print("\tn_y = %s" % ny)
+    print("\tn_vertices = %s" % (nx*ny))
     print("\tside = %s" % side)
     coverage = (nx-1)*(ny-1)*side*side*100
     print("\tcoverage = %s %%" % (coverage/float(s1.get_area())))
 
+    """
     n_sets = 2
     j = 0
     vertices = [[],[]]
@@ -94,5 +105,5 @@ if __name__ == "__main__":
         print "---- set %s ----" % i
         print "\n".join([str(p) for p in set])
         i = i + 1
-
+    """
 
