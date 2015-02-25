@@ -37,7 +37,22 @@ class HexGrid(Grid):
     def _get_coverage(self):
         return (self.ny-1)*(self.nx-1)*self.side*self.side*math.sqrt(3)/2.0
 
+    def get_vertices(self, n_sets=3):
+        assert n_sets == 3, "Not implemented for other but 3"
 
+        vertices = [[],[],[]]
+        for yy in xrange(self.ny):
+            i = 0
+            y_coord = self.polygon.get_min_y() + yy*self.side*math.sqrt(3)/2.0
+            x_offset = 0
+            j = 0
+            if yy % 2 != 0:
+                x_offset = self.side/2.0
+                j = 2
+            for xx in xrange(self.nx):
+                vertices[(j + i)%n_sets].append( (x_offset + self.polygon.get_min_x() + xx*self.side, y_coord))
+                i += 1
+        return vertices
 
 if __name__ == "__main__":
     # Configure log
@@ -60,26 +75,3 @@ if __name__ == "__main__":
     print("\tn_vertices = %s" % (grid.n_vertices))
     print("\tside = %s" % grid.side)
     print("\tcoverage = %s %%" % grid.coverage)
-
-    """
-    n_sets = 3
-    j = 0
-    vertices = [[],[], []]
-    for yy in xrange(ny):
-        i = 0
-        y_coord = s1.get_min_y() + yy*side*math.sqrt(3)/2.0
-        x_offset = 0
-        if yy % 2 != 0:
-            x_offset = side/2.0
-        for xx in xrange(nx):
-            vertices[(j + i)%n_sets].append( (x_offset + s1.get_min_x() + xx*side, y_coord))
-            i += 1
-        j += n_sets-1
-
-    i = 1
-    for set in vertices:
-        print "---- set %s ----" % i
-        print "\n".join([str(p) for p in set])
-        i = i + 1
-
-    """

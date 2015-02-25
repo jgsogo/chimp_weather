@@ -20,6 +20,9 @@ class Grid(object):
         x, y, self.side = self._compute(n_vertices)
         self.nx, self.ny = self._n_vertices_constraint(n_vertices, x, y)
 
+    def get_vertices(self, n_sets):
+        raise NotImplementedError()
+
     @property
     def n_vertices(self):
         return self.nx*self.ny
