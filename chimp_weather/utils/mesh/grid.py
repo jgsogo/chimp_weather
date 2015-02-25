@@ -6,6 +6,7 @@ from chimp_weather.utils.mesh.polygon import Polygon
 
 class Grid(object):
     float_digits = 4 # precision (this should be the same as the ones stored in the database
+    tolerance = 0.05 # Tolerancia expresada con relación al tamaño del lado
 
     def __init__(self, polygon, n_vertices, n_sets):
         assert isinstance(polygon, Polygon)
@@ -26,7 +27,15 @@ class Grid(object):
     def get_vertices(self):
         raise NotImplementedError()
 
+    def is_grid_vertex(self, px, py):
+        raise NotImplementedError()
+
+    def _get_grid_neighbours(self, px, py):
+        raise NotImplementedError()
+
     def get_neighbours(self, px, py):
+        if self.is_grid_vertex(px, py):
+            return self._get_grid_neighbours(px, py)
         raise NotImplementedError()
 
     @property

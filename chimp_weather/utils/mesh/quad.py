@@ -52,7 +52,20 @@ class QuadGrid(Grid):
             j += self.n_sets-1
         return vertices
 
-    def get_neighbours(self, px, py):
+    def is_grid_vertex(self, px, py):
+        def check_x(x):
+            d = int((x - self.polygon.get_min_x())/self.side)
+            r = ((x - self.polygon.get_min_x()) - self.side*d)
+            return r <= self.side*self.tolerance
+
+        def check_y(y):
+            d = int((y - self.polygon.get_min_y())/self.side)
+            r = ((y - self.polygon.get_min_y()) - self.side*d)
+            return r <= self.side*self.tolerance
+
+        return check_x(px) and check_y(py)
+
+    def _get_grid_neighbours(self, px, py):
         neighbours = [[(px, py+self.side), (px, py-self.side),
                       (px+self.side, py), (px-self.side, py)], ]
         return neighbours # All neighbours belongs to the 'other' set
@@ -84,7 +97,7 @@ if __name__ == "__main__":
 
     print("\tneighbours:")
     i = 0
-    for set in grid.get_neighbours(0, 0):
+    for set in grid.get_neighbours(-5, -5):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:

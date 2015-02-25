@@ -54,7 +54,23 @@ class HexGrid(Grid):
                 i += 1
         return vertices
 
-    def get_neighbours(self, px, py):
+    def is_grid_vertex(self, px, py):
+        height = round(self.side*math.sqrt(3)/2.0, self.float_digits)
+        y_slot = 0
+        def check_y(y):
+            y_slot = int((y - self.polygon.get_min_y())/height)
+            r = ((y - self.polygon.get_min_y()) - height*y_slot)
+            return r <= self.side*self.tolerance
+
+        def check_x(x):
+            x_offset = 0.0 if y_slot % 2 == 0 else self.side/2.0
+            d = int((x - self.polygon.get_min_x() + x_offset)/self.side)
+            r = ((x - self.polygon.get_min_x() + x_offset) - self.side*d)
+            return r <= self.side*self.tolerance
+
+        return check_y(py) and check_x(px)
+
+    def _get_grid_neighbours(self, px, py):
         h = round(math.sqrt(3)/2.0*self.side, self.float_digits)
         neighbours = [[ (px+self.side, py),
                         (px-self.side/2., py+h),
