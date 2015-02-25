@@ -2,28 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import math
-from random import random
-from chimp_weather.utils.mesh.polygon import Polygon
+from chimp_weather.utils.mesh.grid import Grid
 
 import logging
 log = logging.getLogger(__name__)
 
 
-def compute_hex_mesh(polygon, n_vertices, fixed_side=None):
-    """
-    Calcula la cuadrícula HEXAGONAL que mejor se adapta al polígono introducido como parámetro y que tiene un número de
-    vértices lo más próximo posible a 'n_vertices'.
-    Devuelve una tupla con:
-     * número de vértices según la coordenada x
-     * número de vértices según la coordenada y
-     * longitud del lado
-    """
-    log.debug(u">> compute_hex_mesh(polygon=%s, n_vertices=%s, fixed_side=%s)" % (type(polygon).__name__, n_vertices, fixed_side))
-    assert isinstance(polygon, Polygon)
-
-    if not fixed_side:
-        # Compute fixed_length based on 'n_vertices'
-        log.debug(u"compute hex grid 'side' with n_vertices=%s" % n_vertices)
+class HexGrid(Grid):
+    def _compute(self, n_vertices):
+        """
+        Calcula la cuadrícula HEXAGONAL que mejor se adapta al polígono introducido como parámetro y que tiene un número de
+        vértices lo más próximo posible a 'n_vertices'.
+        Devuelve una tupla con:
+         * número de vértices según la coordenada x
+         * número de vértices según la coordenada y
+         * longitud del lado
+        """
 
         # Sistema de ecuaciones:
         #   x*y = n_vertices                <- la suma de puntos tiene que ser la indicada (o inferior)
@@ -31,25 +25,18 @@ def compute_hex_mesh(polygon, n_vertices, fixed_side=None):
         #   (y-1)*side*sqrt(3)/2 = height
         #   y tenemos que resolver una ecuación de segundo grado para calcular 'side'
         a = math.sqrt(3)*(2*n_vertices-1)
-        b = -2*(polygon.get_height() + math.sqrt(3)*polygon.get_width())
-        c = -4*polygon.get_width()*polygon.get_height()
+        b = -2*(self.polygon.get_height() + math.sqrt(3)*self.polygon.get_width())
+        c = -4*self.polygon.get_width()*self.polygon.get_height()
         fixed_side = (-b + math.sqrt(b*b - 4*a*c))/(2.0*a)
-        #side2 = (-b - math.sqrt(b*b - 4*a*c))/2.0
-        log.debug(u"fixed_side = %s" % fixed_side)
-        return compute_hex_mesh(polygon, n_vertices, fixed_side)
 
-    x = int(round( (2.0*polygon.get_width()+fixed_side)/(2.0*fixed_side) ))
-    y = int(round( (2.0*polygon.get_height() + math.sqrt(3)*fixed_side)/(math.sqrt(3)*fixed_side) ))
+        x = int(round( (2.0*self.polygon.get_width()+fixed_side)/(2.0*fixed_side) ))
+        y = int(round( (2.0*self.polygon.get_height() + math.sqrt(3)*fixed_side)/(math.sqrt(3)*fixed_side) ))
 
-    while x*y > n_vertices:
-        if y > x:
-            y = y-1
-        elif x > y:
-            x = x-1
-        else:
-            y = y-1 #TODO: Pensar si es adecuado.
+        return x, y, fixed_side
 
-    return x, y, fixed_side
+    def _get_coverage(self):
+        return (self.ny-1)*(self.nx-1)*self.side*self.side*math.sqrt(3)/2.0
+
 
 
 if __name__ == "__main__":
@@ -65,13 +52,14 @@ if __name__ == "__main__":
     from chimp_weather.utils.mesh.polygon import Square
     s1 = Square(0, 0, 5, 1.733*2.)
 
-    nx, ny, side = compute_hex_mesh(s1, 1000)
-    print("\tn_x = %s" % nx)
-    print("\tn_y = %s" % ny)
-    print("\tn_vertices = %s" % (nx*ny))
-    print("\tside = %s" % side)
-    coverage = (ny-1)*(nx-1)*side*side*math.sqrt(3)/2.0*100
-    print("\tcoverage = %s %%" % (coverage/float(s1.get_area())))
+    grid = HexGrid(polygon=s1)
+    grid.compute(1000)
+
+    print("\tn_x = %s" % grid.nx)
+    print("\tn_y = %s" % grid.ny)
+    print("\tn_vertices = %s" % (grid.n_vertices))
+    print("\tside = %s" % grid.side)
+    print("\tcoverage = %s %%" % grid.coverage)
 
     """
     n_sets = 3
