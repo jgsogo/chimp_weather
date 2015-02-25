@@ -22,6 +22,11 @@ class Polygon(object):
     def get_height(self):
         raise NotImplementedError()
 
+    def get_area(self):
+        raise NotImplementedError()
+
+    def is_inside(self, px, py):
+        raise NotImplementedError()
 
 class Square(Polygon):
     x = 0
@@ -53,3 +58,6 @@ class Square(Polygon):
 
     def get_height(self):
         return self.height
+
+    def get_area(self):
+        return (self.width*self.height)
