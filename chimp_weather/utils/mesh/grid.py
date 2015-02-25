@@ -5,22 +5,28 @@ from chimp_weather.utils.mesh.polygon import Polygon
 
 
 class Grid(object):
+    float_digits = 4 # precision (this should be the same as the ones stored in the database
 
-    def __init__(self, polygon):
+    def __init__(self, polygon, n_vertices, n_sets):
         assert isinstance(polygon, Polygon)
         self.polygon = polygon
+        self._n_vertices = n_vertices
+        self.n_sets = n_sets
 
-    def _compute(self, n_vertices):
+    def _compute(self):
         raise NotImplementedError()
 
     def _get_coverage(self):
         raise NotImplementedError()
 
-    def compute(self, n_vertices):
-        x, y, self.side = self._compute(n_vertices)
-        self.nx, self.ny = self._n_vertices_constraint(n_vertices, x, y)
+    def compute(self):
+        x, y, self.side = self._compute()
+        self.nx, self.ny = self._n_vertices_constraint(self._n_vertices, x, y)
 
-    def get_vertices(self, n_sets):
+    def get_vertices(self):
+        raise NotImplementedError()
+
+    def get_neighbours(self, px, py):
         raise NotImplementedError()
 
     @property
@@ -32,7 +38,8 @@ class Grid(object):
         coverage = self._get_coverage()
         return coverage/float(self.polygon.get_area())
 
-    def _n_vertices_constraint(self, n_vertices, x, y):
+    @classmethod
+    def _n_vertices_constraint(cls, n_vertices, x, y):
         while x*y > n_vertices:
             if y > x:
                 y = y-1
