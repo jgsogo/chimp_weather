@@ -66,10 +66,27 @@ class QuadGrid(Grid):
         return check_x(px) and check_y(py)
 
     def _get_grid_neighbours(self, px, py):
+        # When the point belongs to the grid:
+        #  * there are 4 neighbours
+        #  * all neighbours belong to the 'other' set
         neighbours = [[(px, py+self.side), (px, py-self.side),
                       (px+self.side, py), (px-self.side, py)], ]
-        return neighbours # All neighbours belongs to the 'other' set
+        return neighbours
 
+    def _get_grid_closest(self, px, py):
+        # When the point do not belong to the grid:
+        #  * there are four neighbours
+        #  * they belongs to two sets
+        dx = int((px - self.polygon.get_min_x())/self.side)
+        dy = int((py - self.polygon.get_min_y())/self.side)
+
+        x_min = round(self.polygon.get_min_x() + self.side*dx, self.float_digits)
+        y_min = round(self.polygon.get_min_y() + self.side*dy, self.float_digits)
+        neighbours = [[(x_min, y_min),
+                       (x_min + self.side, y_min + self.side),],
+                      [(x_min + self.side, y_min),
+                       (x_min, y_min + self.side),]]
+        return neighbours
 
 if __name__ == "__main__":
     # Configure log
@@ -95,9 +112,19 @@ if __name__ == "__main__":
     print("\tside = %s" % grid.side)
     print("\tcoverage = %s %%" % grid.coverage)
 
-    print("\tneighbours:")
+    p1 = (-5, -5)
+    print("\tneighbours of %s" % str(p1))
     i = 0
-    for set in grid.get_neighbours(-5, -5):
+    for set in grid.get_neighbours(p1[0], p1[1]):
+        i += 1
+        print("\t\tset %s:" % i)
+        for p in set:
+            print("\t\t\t%s" % str(p))
+
+    p2 = (2, 1)
+    print("\tneighbours of %s" % str(p2))
+    i = 0
+    for set in grid.get_neighbours(p2[0], p2[1]):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:

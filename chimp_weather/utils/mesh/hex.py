@@ -71,6 +71,9 @@ class HexGrid(Grid):
         return check_y(py) and check_x(px)
 
     def _get_grid_neighbours(self, px, py):
+        # When the point belongs to the grid:
+        #  * there are 6 neighbours
+        #  * neighbours belong to two sets
         h = round(math.sqrt(3)/2.0*self.side, self.float_digits)
         neighbours = [[ (px+self.side, py),
                         (px-self.side/2., py+h),
@@ -80,6 +83,32 @@ class HexGrid(Grid):
                         (px+self.side/2., py-h)],
                       ]
         return neighbours # Neighbours belongs to two sets
+
+    def _get_grid_closest(self, px, py):
+        # When the point do not belong to the grid:
+        #  * there are three neighbours
+        #  * one in each set
+        height = round(self.side*math.sqrt(3)/2.0, self.float_digits)
+        dy = int((py - self.polygon.get_min_y())/height)
+        ry = ((py - self.polygon.get_min_y()) - height*dy)
+
+        y_slot = int((py - self.polygon.get_min_y())/height)
+        x_offset = 0.0 if y_slot % 2 == 0 else self.side/2.0
+        dx = int((px - self.polygon.get_min_x() + x_offset)/self.side)
+        rx = ((px - self.polygon.get_min_x() + x_offset) - self.side*dx)
+
+        if rx > self.side:
+            rx = self.side - rx
+
+        x_min = round(self.polygon.get_min_x() + self.side*dx + x_offset, self.float_digits)
+        y_min = round(self.polygon.get_min_y() + height*dy, self.float_digits)
+
+        if ry/rx <= math.sqrt(3): # ry/rx <= tan60
+            # Dos vertices debajo || Un vertice encima
+            return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height)]]
+        else:
+            # Un vertice debajo || Dos vertices encima
+            return [[(x_min, y_min)], [(x_min - self.side/2., y_min + height)], [(x_min + self.side/2., y_min + height)]]
 
 
 if __name__ == "__main__":
@@ -106,9 +135,19 @@ if __name__ == "__main__":
     print("\tside = %s" % grid.side)
     print("\tcoverage = %s %%" % grid.coverage)
 
-    print("\tneighbours:")
+    p1 = (0, 0)
+    print("\tneighbours of %s" % str(p1))
     i = 0
-    for set in grid.get_neighbours(0, 0):
+    for set in grid.get_neighbours(p1[0], p1[1]):
+        i += 1
+        print("\t\tset %s:" % i)
+        for p in set:
+            print("\t\t\t%s" % str(p))
+
+    p2 = (2, 1)
+    print("\tneighbours of %s" % str(p2))
+    i = 0
+    for set in grid.get_neighbours(p2[0], p2[1]):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:

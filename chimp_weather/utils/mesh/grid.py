@@ -33,10 +33,14 @@ class Grid(object):
     def _get_grid_neighbours(self, px, py):
         raise NotImplementedError()
 
+    def _get_grid_closest(self, px, py):
+        raise NotImplementedError
+
     def get_neighbours(self, px, py):
         if self.is_grid_vertex(px, py):
             return self._get_grid_neighbours(px, py)
-        raise NotImplementedError()
+        else:
+            return self._get_grid_closest(px, py)
 
     @property
     def n_vertices(self):
