@@ -111,8 +111,23 @@ class HexGrid(Grid):
             return [[(x_min, y_min)], [(x_min - self.side/2., y_min + height)], [(x_min + self.side/2., y_min + height)]]
 
 
+def run_tests():
+    import unittest
+    testsuite = unittest.TestLoader().loadTestsFromName('tests.test_hex')
+    unittest.TextTestRunner(verbosity=1).run(testsuite)
+
+
 if __name__ == "__main__":
-    # Configure log
+    # Run tests
+    print(u"===========================")
+    print(u"Running tests for 'hex.py'")
+    print(u"===========================")
+    run_tests()
+
+    print("\n\n")
+    print(u"===========================")
+    print(u"Usage examples")
+    print(u"===========================")    # Configure log
     log.setLevel(logging.DEBUG)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
