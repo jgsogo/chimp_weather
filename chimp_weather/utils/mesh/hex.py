@@ -56,17 +56,17 @@ class HexGrid(Grid):
 
     def is_grid_vertex(self, px, py):
         height = round(self.side*math.sqrt(3)/2.0, self.float_digits)
-        y_slot = 0
+        y_slot = int((py - self.polygon.get_min_y())/height)
+        x_offset = 0.0 if y_slot % 2 == 0 else self.side/2.0
+
         def check_y(y):
-            y_slot = int((y - self.polygon.get_min_y())/height)
             r = ((y - self.polygon.get_min_y()) - height*y_slot)
-            return r <= self.side*self.tolerance
+            return r <= self.side*self.tolerance or abs(r - self.side*self.tolerance) < self.epsilon
 
         def check_x(x):
-            x_offset = 0.0 if y_slot % 2 == 0 else self.side/2.0
             d = int((x - self.polygon.get_min_x() + x_offset)/self.side)
             r = ((x - self.polygon.get_min_x() + x_offset) - self.side*d)
-            return r <= self.side*self.tolerance
+            return r <= self.side*self.tolerance or abs(r - self.side*self.tolerance) < self.epsilon
 
         return check_y(py) and check_x(px)
 
@@ -97,13 +97,31 @@ class HexGrid(Grid):
         dx = int((px - self.polygon.get_min_x() + x_offset)/self.side)
         rx = ((px - self.polygon.get_min_x() + x_offset) - self.side*dx)
 
-        if rx > self.side:
+        if rx == 0 and ry == 0:
+            raise ValueError("This point belongs to the grid!")
+
+        if rx > self.side/2.0:
             rx = self.side - rx
 
         x_min = round(self.polygon.get_min_x() + self.side*dx + x_offset, self.float_digits)
         y_min = round(self.polygon.get_min_y() + height*dy, self.float_digits)
 
-        if ry/rx <= math.sqrt(3): # ry/rx <= tan60
+        if rx == 0:
+            if ry > 0:
+                # Uno abajo || Dos arriba
+                y_coord = round(y_min + height, self.float_digits)
+                return [[(x_min, y_min)], [(x_min - self.side/2., y_coord)], [(x_min + self.side/2., y_coord)]]
+            else:
+                # Dos abajo || uno encima
+                return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height)]]
+        elif ry == 0:
+            # Tenemos CUATRO VECINOS!!
+            if rx > 0:
+                return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height), (x_min + self.side/2., y_min - height)]]
+            else:
+                return [[(x_min, y_min)], [(x_min - self.side, y_min)], [(x_min - self.side/2., y_min + height), (x_min - self.side/2., y_min - height)]]
+
+        elif ry/rx <= math.sqrt(3): # ry/rx <= tan60
             # Dos vertices debajo || Un vertice encima
             return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height)]]
         else:

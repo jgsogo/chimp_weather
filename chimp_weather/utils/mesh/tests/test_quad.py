@@ -31,13 +31,13 @@ class QuadGridTestCase(unittest.TestCase):
         self.assertEqual(grid.side, 1)
 
     def test_compute_rand(self):
-        for i in xrange(10):
+        for i in xrange(100):
             n_vertices = random.randint(4, 1000)
             grid = QuadGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=2)
             grid.compute()
 
             self.assertLessEqual(grid.n_vertices, n_vertices)
-            self.assertLessEqual(grid.coverage, 1)
+            self.assertLessEqual(grid.coverage, 1.05)
 
     def test_grid_vertices(self):
         grid = QuadGrid(polygon=self.square1, n_vertices=100, n_sets=2)
@@ -68,7 +68,7 @@ class QuadGridTestCase(unittest.TestCase):
         grid = QuadGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=n_sets)
         grid.compute()
 
-        for i in xrange(10):
+        for i in xrange(100):
             p1 = (random.randint(0,10), random.randint(0,10))
             if grid.is_grid_vertex(p1[0], p1[1]):
                 neighbours = grid.get_neighbours(p1[0], p1[1])
@@ -81,4 +81,4 @@ class QuadGridTestCase(unittest.TestCase):
 
             for set in neighbours:
                 for p in set:
-                    self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True)
+                    self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
