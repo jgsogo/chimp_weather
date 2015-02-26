@@ -16,6 +16,7 @@ class Polygon(object):
     points = []
 
     def __init__(self, points):
+        Polygon._check_integrity(points)
         self.points = points
 
     @classmethod
@@ -40,23 +41,37 @@ class Polygon(object):
                     raise ValueError("Segments intersects")
         return True
 
-    def get_min_x(self):
-        raise NotImplementedError()
+    @property
+    def min_x(self):
+        if not hasattr(self, '_min_x'):
+            setattr(self, '_min_x', min([p[0] for p in self.points]))
+        return getattr(self, '_min_x')
 
-    def get_min_y(self):
-        raise NotImplementedError()
+    @property
+    def min_y(self):
+        if not hasattr(self, '_min_y'):
+            setattr(self, '_min_y', min([p[1] for p in self.points]))
+        return getattr(self, '_min_y')
 
-    def get_max_x(self):
-        raise NotImplementedError()
+    @property
+    def max_x(self):
+        if not hasattr(self, '_max_x'):
+            setattr(self, '_max_x', max([p[0] for p in self.points]))
+        return getattr(self, '_max_x')
 
-    def get_max_y(self):
-        raise NotImplementedError()
+    @property
+    def max_y(self):
+        if not hasattr(self, '_max_y'):
+            setattr(self, '_max_y', max([p[1] for p in self.points]))
+        return getattr(self, '_max_y')
 
-    def get_width(self):
-        raise NotImplementedError()
+    @property
+    def width(self):
+        return self.max_x - self.min_x
 
-    def get_height(self):
-        raise NotImplementedError()
+    @property
+    def height(self):
+        return self.max_y - self.min_y
 
     def get_area(self):
         raise NotImplementedError()
@@ -64,36 +79,11 @@ class Polygon(object):
     def is_inside(self, px, py):
         raise NotImplementedError()
 
-class Square(Polygon):
-    x = 0
-    y = 0
-    width = 1
-    height = 1
 
-    def __init__(self, x, y, width, height, *args, **kwargs):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        super(Square, self).__init__(*args, **kwargs)
-
-    def get_min_x(self):
-        return self.x
-
-    def get_min_y(self):
-        return self.y
-
-    def get_max_x(self):
-        return self.x + self.width
-
-    def get_max_y(self):
-        return self.y + self.height
-
-    def get_width(self):
-        return self.width
-
-    def get_height(self):
-        return self.height
+class Rectangle(Polygon):
+    def __init__(self, x, y, width, height):
+        points = [(x,y), (x+width, y), (x+width, y+height), (x, y+height)]
+        super(Rectangle, self).__init__(points)
 
     def get_area(self):
         return (self.width*self.height)

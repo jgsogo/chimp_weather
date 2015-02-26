@@ -8,7 +8,7 @@ import math
 
 from chimp_weather.utils.mesh.segment import Point, do_intersect
 
-
+"""
 class SingleTestCase(unittest.TestCase):
     def do_test(self, p1, q1, p2, q2, same_as_intersection, expected):
         msg = None
@@ -22,6 +22,7 @@ class SingleTestCase(unittest.TestCase):
         p1 = Point(0, 0)
         q1 = Point(10, 0)
         self.do_test(p1, q1, p1,  Point(20,0), False, True)
+"""
 
 
 class SegmentTestCase(unittest.TestCase):
