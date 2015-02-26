@@ -25,12 +25,12 @@ class HexGrid(Grid):
         #   (y-1)*side*sqrt(3)/2 = height
         #   y tenemos que resolver una ecuación de segundo grado para calcular 'side'
         a = math.sqrt(3)*(2*self._n_vertices-1)
-        b = -2*(self.polygon.get_height() + math.sqrt(3)*self.polygon.get_width())
-        c = -4*self.polygon.get_width()*self.polygon.get_height()
+        b = -2*(self.polygon.height + math.sqrt(3)*self.polygon.width)
+        c = -4*self.polygon.width*self.polygon.height
         fixed_side = round((-b + math.sqrt(b*b - 4*a*c))/(2.0*a), self.float_digits)
 
-        x = int(round( (2.0*self.polygon.get_width()+fixed_side)/(2.0*fixed_side) ))
-        y = int(round( (2.0*self.polygon.get_height() + math.sqrt(3)*fixed_side)/(math.sqrt(3)*fixed_side) ))
+        x = int(round( (2.0*self.polygon.width+fixed_side)/(2.0*fixed_side) ))
+        y = int(round( (2.0*self.polygon.height + math.sqrt(3)*fixed_side)/(math.sqrt(3)*fixed_side) ))
 
         return x, y, fixed_side
 
@@ -43,29 +43,29 @@ class HexGrid(Grid):
         vertices = [[],[],[]]
         for yy in xrange(self.ny):
             i = 0
-            y_coord = round(self.polygon.get_min_y() + yy*self.side*math.sqrt(3)/2.0, self.float_digits)
+            y_coord = round(self.polygon.min_y + yy*self.side*math.sqrt(3)/2.0, self.float_digits)
             x_offset = 0
             j = 0
             if yy % 2 != 0:
                 x_offset = self.side/2.0
                 j = 2
             for xx in xrange(self.nx):
-                vertices[(j + i)%self.n_sets].append( (round(x_offset + self.polygon.get_min_x() + xx*self.side, self.float_digits), y_coord))
+                vertices[(j + i)%self.n_sets].append( (round(x_offset + self.polygon.min_x + xx*self.side, self.float_digits), y_coord))
                 i += 1
         return vertices
 
     def is_grid_vertex(self, px, py):
         height = round(self.side*math.sqrt(3)/2.0, self.float_digits)
-        y_slot = int((py - self.polygon.get_min_y())/height)
+        y_slot = int((py - self.polygon.min_y)/height)
         x_offset = 0.0 if y_slot % 2 == 0 else self.side/2.0
 
         def check_y(y):
-            r = ((y - self.polygon.get_min_y()) - height*y_slot)
+            r = ((y - self.polygon.min_y) - height*y_slot)
             return r <= self.side*self.tolerance or abs(r - self.side*self.tolerance) < self.epsilon
 
         def check_x(x):
-            d = int((x - self.polygon.get_min_x() + x_offset)/self.side)
-            r = ((x - self.polygon.get_min_x() + x_offset) - self.side*d)
+            d = int((x - self.polygon.min_x + x_offset)/self.side)
+            r = ((x - self.polygon.min_x + x_offset) - self.side*d)
             return r <= self.side*self.tolerance or abs(r - self.side*self.tolerance) < self.epsilon
 
         return check_y(py) and check_x(px)
@@ -89,13 +89,13 @@ class HexGrid(Grid):
         #  * there are three neighbours
         #  * one in each set
         height = round(self.side*math.sqrt(3)/2.0, self.float_digits)
-        dy = int((py - self.polygon.get_min_y())/height)
-        ry = ((py - self.polygon.get_min_y()) - height*dy)
+        dy = int((py - self.polygon.min_y)/height)
+        ry = ((py - self.polygon.min_y) - height*dy)
 
-        y_slot = int((py - self.polygon.get_min_y())/height)
+        y_slot = int((py - self.polygon.min_y)/height)
         x_offset = 0.0 if y_slot % 2 == 0 else self.side/2.0
-        dx = int((px - self.polygon.get_min_x() + x_offset)/self.side)
-        rx = ((px - self.polygon.get_min_x() + x_offset) - self.side*dx)
+        dx = int((px - self.polygon.min_x + x_offset)/self.side)
+        rx = ((px - self.polygon.min_x + x_offset) - self.side*dx)
 
         if rx == 0 and ry == 0:
             raise ValueError("This point belongs to the grid!")
@@ -103,8 +103,8 @@ class HexGrid(Grid):
         if rx > self.side/2.0:
             rx = self.side - rx
 
-        x_min = round(self.polygon.get_min_x() + self.side*dx + x_offset, self.float_digits)
-        y_min = round(self.polygon.get_min_y() + height*dy, self.float_digits)
+        x_min = round(self.polygon.min_x + self.side*dx + x_offset, self.float_digits)
+        y_min = round(self.polygon.min_y + height*dy, self.float_digits)
 
         if rx == 0:
             if ry > 0:
@@ -129,17 +129,22 @@ class HexGrid(Grid):
             return [[(x_min, y_min)], [(x_min - self.side/2., y_min + height)], [(x_min + self.side/2., y_min + height)]]
 
 
-def run_tests():
+def run_tests(verbosity=10):
+    from chimp_weather.utils.mesh.grid import run_tests as grid_tests
+    grid_tests(verbosity)
+    print("\n\n")
+
+    print(u"===========================")
+    print(u"Running tests for 'hex.py'")
+    print(u"===========================")
+
     import unittest
     testsuite = unittest.TestLoader().loadTestsFromName('tests.test_hex')
-    unittest.TextTestRunner(verbosity=1).run(testsuite)
+    unittest.TextTestRunner(verbosity=verbosity).run(testsuite)
 
 
 if __name__ == "__main__":
     # Run tests
-    print(u"===========================")
-    print(u"Running tests for 'hex.py'")
-    print(u"===========================")
     run_tests()
 
     print("\n\n")
@@ -154,8 +159,8 @@ if __name__ == "__main__":
     log.addHandler(ch)
 
     # Example - square
-    from chimp_weather.utils.mesh.polygon import Square
-    s1 = Square(0, 0, 5, 1.733*2.)
+    from chimp_weather.utils.mesh.polygon import Rectangle
+    s1 = Rectangle(0, 0, 5, 1.733*2.)
 
     n_vertices = 1000
     n_sets = 3

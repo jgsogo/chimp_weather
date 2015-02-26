@@ -65,3 +65,21 @@ class Grid(object):
                 y = y-1 #TODO: Pensar si es adecuado.
         return x, y
 
+
+def run_tests(verbosity=10):
+    from chimp_weather.utils.mesh.polygon import run_tests as polygon_tests
+    polygon_tests(verbosity)
+    print("\n\n")
+
+    print(u"===========================")
+    print(u"Running tests for 'grid.py'")
+    print(u"===========================")
+
+    #import unittest
+    #testsuite = unittest.TestLoader().loadTestsFromName('tests.test_polygon')
+    #unittest.TextTestRunner(verbosity=verbosity).run(testsuite)
+
+
+if __name__ == "__main__":
+    # Run tests
+    run_tests()

@@ -10,8 +10,8 @@ from chimp_weather.utils.mesh.quad import QuadGrid
 
 class QuadGridTestCase(unittest.TestCase):
     def setUp(self):
-        from chimp_weather.utils.mesh.polygon import Square
-        self.square1 = Square(0, 0, 9, 9)
+        from chimp_weather.utils.mesh.polygon import Rectangle
+        self.square1 = Rectangle(0, 0, 9, 9)
 
     def test_init(self):
         n_vertices = random.randint(4, 1000)

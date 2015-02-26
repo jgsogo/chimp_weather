@@ -11,8 +11,8 @@ from chimp_weather.utils.mesh.hex import HexGrid
 
 class HexGridTestCase(unittest.TestCase):
     def setUp(self):
-        from chimp_weather.utils.mesh.polygon import Square
-        self.square1 = Square(0, 0, 5.5, 3*math.sqrt(3)/2.)
+        from chimp_weather.utils.mesh.polygon import Rectangle
+        self.square1 = Rectangle(0, 0, 5.5, 3*math.sqrt(3)/2.)
         self.n_sets = 3
 
     def test_init(self):
