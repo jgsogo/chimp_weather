@@ -40,7 +40,7 @@ class Polygon(object):
             q1 = pair[0][1]
             p2 = pair[1][0]
             q2 = pair[1][1]
-            if not p1==p2 or not q1==q2:
+            if not (p1==p2 and q1==q2): # Son los productos de un lado consigo mismo
                 if do_intersect(p1, q1, p2, q2, same_is_intersection=False):
                     raise ValueError("Segments intersects")
         return True

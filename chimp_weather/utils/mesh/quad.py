@@ -3,6 +3,7 @@
 
 import math
 from chimp_weather.utils.mesh.grid import Grid
+from chimp_weather.utils.mesh.point import Point
 
 import logging
 log = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ class QuadGrid(Grid):
             i = 0
             y_coord = round(s1.min_y + yy*self.side, self.float_digits)
             for xx in xrange(self.nx):
-                vertices[(j + i)%self.n_sets].append( (round(s1.min_x + xx*self.side, self.float_digits), y_coord))
+                vertices[(j + i)%self.n_sets].append( Point(round(s1.min_x + xx*self.side, self.float_digits), y_coord))
                 i += 1
             j += self.n_sets-1
         return vertices
@@ -71,8 +72,8 @@ class QuadGrid(Grid):
         # When the point belongs to the grid:
         #  * there are 4 neighbours
         #  * all neighbours belong to the 'other' set
-        neighbours = [[(px, py+self.side), (px, py-self.side),
-                      (px+self.side, py), (px-self.side, py)], ]
+        neighbours = [[Point(px, py+self.side), Point(px, py-self.side),
+                      Point(px+self.side, py), Point(px-self.side, py)], ]
         return neighbours
 
     def _get_grid_closest(self, px, py):
@@ -84,10 +85,10 @@ class QuadGrid(Grid):
 
         x_min = round(self.polygon.min_x + self.side*dx, self.float_digits)
         y_min = round(self.polygon.min_y + self.side*dy, self.float_digits)
-        neighbours = [[(x_min, y_min),
-                       (x_min + self.side, y_min + self.side),],
-                      [(x_min + self.side, y_min),
-                       (x_min, y_min + self.side),]]
+        neighbours = [[Point(x_min, y_min),
+                       Point(x_min + self.side, y_min + self.side),],
+                      [Point(x_min + self.side, y_min),
+                       Point(x_min, y_min + self.side),]]
         return neighbours
 
 
@@ -135,20 +136,20 @@ if __name__ == "__main__":
     print("\tside = %s" % grid.side)
     print("\tcoverage = %s %%" % grid.coverage)
 
-    p1 = (-5, -5)
-    print("\tneighbours of %s" % str(p1))
+    p1 = Point(-5, -5)
+    print("\tneighbours of %s" % p1)
     i = 0
-    for set in grid.get_neighbours(p1[0], p1[1]):
+    for set in grid.get_neighbours(p1.x, p1.y):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:
-            print("\t\t\t%s" % str(p))
+            print("\t\t\t%s" % p)
 
-    p2 = (2, 1)
-    print("\tneighbours of %s" % str(p2))
+    p2 = Point(2, 1)
+    print("\tneighbours of %s" % p2)
     i = 0
-    for set in grid.get_neighbours(p2[0], p2[1]):
+    for set in grid.get_neighbours(p2.x, p2.y):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:
-            print("\t\t\t%s" % str(p))
+            print("\t\t\t%s" % p)

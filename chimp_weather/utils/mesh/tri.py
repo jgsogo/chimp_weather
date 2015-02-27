@@ -3,6 +3,7 @@
 
 import math
 from chimp_weather.utils.mesh.grid import Grid
+from chimp_weather.utils.mesh.point import Point
 
 import logging
 log = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class TriGrid(Grid):
                 x_offset = self.side/2.0
                 j = 2
             for xx in xrange(self.nx):
-                vertices[(j + i)%self.n_sets].append( (round(x_offset + self.polygon.min_x + xx*self.side, self.float_digits), y_coord))
+                vertices[(j + i)%self.n_sets].append(Point(round(x_offset + self.polygon.min_x + xx*self.side, self.float_digits), y_coord))
                 i += 1
         return vertices
 
@@ -78,12 +79,12 @@ class TriGrid(Grid):
         #  * there are 6 neighbours
         #  * neighbours belong to two sets
         h = round(math.sqrt(3)/2.0*self.side, self.float_digits)
-        neighbours = [[ (px+self.side, py),
-                        (px-self.side/2., py+h),
-                        (px-self.side/2., py-h)],
-                      [ (px-self.side, py),
-                        (px+self.side/2., py+h),
-                        (px+self.side/2., py-h)],
+        neighbours = [[ Point(px+self.side, py),
+                        Point(px-self.side/2., py+h),
+                        Point(px-self.side/2., py-h)],
+                      [ Point(px-self.side, py),
+                        Point(px+self.side/2., py+h),
+                        Point(px+self.side/2., py-h)],
                       ]
         return neighbours # Neighbours belongs to two sets
 
@@ -113,23 +114,23 @@ class TriGrid(Grid):
             if ry > 0:
                 # Uno abajo || Dos arriba
                 y_coord = round(y_min + height, self.float_digits)
-                return [[(x_min, y_min)], [(x_min - self.side/2., y_coord)], [(x_min + self.side/2., y_coord)]]
+                return [[Point(x_min, y_min)], [Point(x_min - self.side/2., y_coord)], [Point(x_min + self.side/2., y_coord)]]
             else:
                 # Dos abajo || uno encima
-                return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height)]]
+                return [[Point(x_min, y_min)], [Point(x_min + self.side, y_min)], [Point(x_min + self.side/2., y_min + height)]]
         elif ry == 0:
             # Tenemos CUATRO VECINOS!!
             if rx > 0:
-                return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height), (x_min + self.side/2., y_min - height)]]
+                return [[Point(x_min, y_min)], [Point(x_min + self.side, y_min)], [Point(x_min + self.side/2., y_min + height), Point(x_min + self.side/2., y_min - height)]]
             else:
-                return [[(x_min, y_min)], [(x_min - self.side, y_min)], [(x_min - self.side/2., y_min + height), (x_min - self.side/2., y_min - height)]]
+                return [[Point(x_min, y_min)], [Point(x_min - self.side, y_min)], [Point(x_min - self.side/2., y_min + height), Point(x_min - self.side/2., y_min - height)]]
 
         elif ry/rx <= math.sqrt(3): # ry/rx <= tan60
             # Dos vertices debajo || Un vertice encima
-            return [[(x_min, y_min)], [(x_min + self.side, y_min)], [(x_min + self.side/2., y_min + height)]]
+            return [[Point(x_min, y_min)], [Point(x_min + self.side, y_min)], [Point(x_min + self.side/2., y_min + height)]]
         else:
             # Un vertice debajo || Dos vertices encima
-            return [[(x_min, y_min)], [(x_min - self.side/2., y_min + height)], [(x_min + self.side/2., y_min + height)]]
+            return [[Point(x_min, y_min)], [Point(x_min - self.side/2., y_min + height)], [Point(x_min + self.side/2., y_min + height)]]
 
 
 def run_tests(verbosity=10):
@@ -175,20 +176,20 @@ if __name__ == "__main__":
     print("\tside = %s" % grid.side)
     print("\tcoverage = %s %%" % grid.coverage)
 
-    p1 = (0, 0)
-    print("\tneighbours of %s" % str(p1))
+    p1 = Point(0, 0)
+    print("\tneighbours of %s" % p1)
     i = 0
-    for set in grid.get_neighbours(p1[0], p1[1]):
+    for set in grid.get_neighbours(p1.x, p1.y):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:
-            print("\t\t\t%s" % str(p))
+            print("\t\t\t%s" % p)
 
-    p2 = (2, 1)
-    print("\tneighbours of %s" % str(p2))
+    p2 = Point(2, 1)
+    print("\tneighbours of %s" % p2)
     i = 0
-    for set in grid.get_neighbours(p2[0], p2[1]):
+    for set in grid.get_neighbours(p2.x, p2.y):
         i += 1
         print("\t\tset %s:" % i)
         for p in set:
-            print("\t\t\t%s" % str(p))
+            print("\t\t\t%s" % p)

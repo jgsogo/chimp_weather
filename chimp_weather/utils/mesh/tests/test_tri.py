@@ -7,6 +7,7 @@ import random
 import math
 
 from chimp_weather.utils.mesh.tri import TriGrid
+from chimp_weather.utils.mesh.point import Point
 
 
 class TriGridTestCase(unittest.TestCase):
@@ -47,8 +48,8 @@ class TriGridTestCase(unittest.TestCase):
         for y in xrange(4):
             x_offset = 0.0 if y % 2 == 0 else grid.side/2.0
             for x in xrange(6):
-                p = (x_offset + x*grid.side, y*math.sqrt(3)/2.)
-                self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
+                p = Point(x_offset + x*grid.side, y*math.sqrt(3)/2.)
+                self.assertEqual(grid.is_grid_vertex(p.x, p.y), True, "Failed with point %s" % p)
 
     def test_non_grid_vertices(self):
         grid = TriGrid(polygon=self.square1, n_vertices=24)
@@ -59,10 +60,10 @@ class TriGridTestCase(unittest.TestCase):
         for y in xrange(4):
             x_offset = 0.0 if y % 2 == 0 else grid.side/2.0
             for x in xrange(6):
-                p = (x_offset + x + grid.tolerance*grid.side, y*math.sqrt(3)/2. + grid.tolerance*height)
-                self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
-                p = (x_offset + x + 1.1*grid.tolerance*grid.side, y*math.sqrt(3)/2.)
-                self.assertEqual(grid.is_grid_vertex(p[0], p[1]), False, "Failed with point %s" % str(p))
+                p = Point(x_offset + x + grid.tolerance*grid.side, y*math.sqrt(3)/2. + grid.tolerance*height)
+                self.assertEqual(grid.is_grid_vertex(p.x, p.y), True, "Failed with point %s" % p)
+                p = Point(x_offset + x + 1.1*grid.tolerance*grid.side, y*math.sqrt(3)/2.)
+                self.assertEqual(grid.is_grid_vertex(p.x, p.y), False, "Failed with point %s" % p)
 
     def test_neighbours(self):
         n_vertices = 24
@@ -70,16 +71,16 @@ class TriGridTestCase(unittest.TestCase):
         grid.compute()
 
         for i in xrange(100):
-            p1 = (random.randint(0,10), random.randint(0,10))
-            if grid.is_grid_vertex(p1[0], p1[1]):
-                neighbours = grid.get_neighbours(p1[0], p1[1])
+            p1 = Point(random.randint(0,10), random.randint(0,10))
+            if grid.is_grid_vertex(p1.x, p1.y):
+                neighbours = grid.get_neighbours(p1.x, p1.y)
                 self.assertEqual(len(neighbours), 2)
                 self.assertEqual(sum(len(x) for x in neighbours), 6)
             else:
-                neighbours = grid.get_neighbours(p1[0], p1[1])
+                neighbours = grid.get_neighbours(p1.x, p1.y)
                 self.assertEqual(len(neighbours), 3)
                 self.assertEqual(sum(len(x) for x in neighbours), 3)
 
             for set in neighbours:
                 for p in set:
-                    self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
+                    self.assertEqual(grid.is_grid_vertex(p.x, p.y), True, "Failed with point %s" % p)
