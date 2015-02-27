@@ -9,6 +9,9 @@ log = logging.getLogger(__name__)
 
 
 class TriGrid(Grid):
+    def __init__(self, polygon, n_vertices):
+        super(TriGrid, self).__init__(polygon, n_vertices, 3)
+
     def _compute(self):
         """
         Calcula la cuadrícula HEXAGONAL que mejor se adapta al polígono introducido como parámetro y que tiene un número de
@@ -163,8 +166,7 @@ if __name__ == "__main__":
     s1 = Rectangle(0, 0, 5, 1.733*2.)
 
     n_vertices = 1000
-    n_sets = 3
-    grid = TriGrid(polygon=s1, n_vertices=n_vertices, n_sets=n_sets)
+    grid = TriGrid(polygon=s1, n_vertices=n_vertices)
     grid.compute()
 
     print("\tn_x = %s" % grid.nx)

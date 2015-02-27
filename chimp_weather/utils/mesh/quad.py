@@ -9,6 +9,9 @@ log = logging.getLogger(__name__)
 
 
 class QuadGrid(Grid):
+    def __init__(self, polygon, n_vertices):
+        super(QuadGrid, self).__init__(polygon, n_vertices, 2)
+
     def _compute(self):
         """
         Calcula la cuadrícula HEXAGONAL que mejor se adapta al polígono introducido como parámetro y que tiene un número de
@@ -123,8 +126,7 @@ if __name__ == "__main__":
     s1 = Rectangle(-5, -5, 20, 10)
 
     n_vertices = 1000
-    n_sets = 2
-    grid = QuadGrid(polygon=s1, n_vertices=n_vertices, n_sets=n_sets)
+    grid = QuadGrid(polygon=s1, n_vertices=n_vertices)
     grid.compute()
 
     print("\tn_x = %s" % grid.nx)

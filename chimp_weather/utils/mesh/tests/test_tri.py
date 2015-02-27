@@ -17,14 +17,14 @@ class TriGridTestCase(unittest.TestCase):
 
     def test_init(self):
         n_vertices = random.randint(4, 1000)
-        grid = TriGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=n_vertices)
 
         self.assertEqual(self.square1, grid.polygon)
         self.assertEqual(n_vertices, grid._n_vertices)
         self.assertEqual(self.n_sets, grid.n_sets)
 
     def test_compute(self):
-        grid = TriGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=24)
         grid.compute()
         self.assertEqual(grid.nx, 6)
         self.assertEqual(grid.ny, 4)
@@ -33,14 +33,14 @@ class TriGridTestCase(unittest.TestCase):
     def test_compute_rand(self):
         for i in xrange(100):
             n_vertices = random.randint(4, 1000)
-            grid = TriGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
+            grid = TriGrid(polygon=self.square1, n_vertices=n_vertices)
             grid.compute()
 
             self.assertLessEqual(grid.n_vertices, n_vertices)
             self.assertLessEqual(grid.coverage, 1.05)
 
     def test_grid_vertices(self):
-        grid = TriGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=24)
         grid.compute()
 
         # Pertenecen al grid
@@ -51,7 +51,7 @@ class TriGridTestCase(unittest.TestCase):
                 self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
 
     def test_non_grid_vertices(self):
-        grid = TriGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=24)
         grid.compute()
 
         # No pertenecen al grid
@@ -66,7 +66,7 @@ class TriGridTestCase(unittest.TestCase):
 
     def test_neighbours(self):
         n_vertices = 24
-        grid = TriGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=n_vertices)
         grid.compute()
 
         for i in xrange(100):
