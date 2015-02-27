@@ -49,6 +49,9 @@ class Grid(models.Model):
         verbose_name = _(u'grid')
         verbose_name_plural = _(u'grids')
 
+    def __unicode__(self):
+        return self.name
+
     def set_grid(self, grid):
         if self._type != None:
             raise ValueError("It is not allowed to change grid once created")

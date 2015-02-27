@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from django.contrib.admin.util import flatten_fieldsets
 
-from .models import Observation, Place, SquareArea
+from .models import Grid, GridData
+
 
 class ReadOnlyAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
@@ -21,26 +21,19 @@ class ReadOnlyAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         return self.model._meta.get_all_field_names()
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
-        else:
-            form = self.get_formset(request, obj).form
-            fields = form.base_fields.keys()
-        return fields
 
 
-class ObservationModelAdmin(ReadOnlyAdmin):
-    list_display = ('longitude', 'latitude', 'time', '_non_forecast')
-    list_filter = ('_non_forecast', 'time',)
+class GridModelAdmin(admin.ModelAdmin):
+    list_display = ('name', '_type', '_n_vertices')
+    list_filter = ('_type',)
+    readonly_fields = ('_type', '_n_vertices', '_polygon',)
 
 
 # Places and Areas
-class PlaceModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'longitude', 'latitude',)
+class GridDataModelAdmin(admin.ModelAdmin):
+    list_display = ('grid', 'set', 'time', '_non_forecast',)
+    list_filter = ('_non_forecast',)
 
-class SquareAreaModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'longitude_min', 'longitude_max', 'latitude_min', 'latitude_max')
 
-admin.site.register(Observation, ObservationModelAdmin)
-admin.site.register(Place, PlaceModelAdmin)
-admin.site.register(SquareArea, SquareAreaModelAdmin)
+admin.site.register(Grid, GridModelAdmin)
+admin.site.register(GridData, GridDataModelAdmin)

@@ -37,7 +37,7 @@ class GridData(ObservationBase):
 
     @property
     def points(self):
-        return self.grid.get_points(n_set=self.set)
+        return self.grid.get_points(set=self.set)
 
     def set_observations(self, observations):
         # Hay que almacenar las observaciones ¡¡en orden!!
@@ -70,5 +70,9 @@ def make_observation(grid, set):
         for obs,check in zip(data, points):
             assert  obs['longitude'] == check.x
             assert  obs['latitude'] == check.y
-            temperatures.append(obs['temperature'])
+            temperatures.append(str(obs['temperature']))
+            print "."
+        print temperatures
         o.temperature = u";".join(temperatures)
+        print o.temperature
+        o.save()
