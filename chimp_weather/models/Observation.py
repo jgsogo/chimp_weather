@@ -63,9 +63,9 @@ def round_time(dt=None, roundTo=60):
 
 def make_observation(longitude, latitude, time=None, api_key=None):
     import os
-    import forecastio
+    import forecastio_observation
     api_key = api_key or os.environ['FORECASTIO_API_KEY']
-    forecast = forecastio.load_forecast(api_key, longitude, latitude)
+    forecast = forecastio_observation.load_forecast(api_key, longitude, latitude)
 
     now = round_time(datetime.now(), roundTo=60*60)
 

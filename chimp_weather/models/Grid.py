@@ -8,6 +8,7 @@ from model_utils import Choices
 from chimp_weather.utils.mesh.polygon import Polygon
 from chimp_weather.utils.mesh.quad import QuadGrid
 from chimp_weather.utils.mesh.tri import TriGrid
+from chimp_weather.utils.mesh.point import Point
 
 
 class GridManager(models.Manager):
@@ -62,20 +63,33 @@ class Grid(models.Model):
 
     @property
     def polygon(self):
-        if not self._polygon:
-            return None
-        points = Polygon.deserialize(self._polygon)
-        return Polygon(points)
+        if not hasattr(self, 'polygon__'):
+            if not self._polygon:
+                return None
+            points = Polygon.deserialize(self._polygon)
+            setattr(self, 'polygon__', Polygon(points))
+        return getattr(self, 'polygon__')
 
     @property
     def grid(self):
-        grid = None
-        if self._type == Grid.GRID_TYPES.quad:
-            grid = QuadGrid(self.polygon, self._n_vertices)
-        elif self._type == Grid.GRID_TYPES.tri:
-            grid = TriGrid(self.polygon, self._n_vertices)
-        else:
-            raise AttributeError("Unknown grid type: %s" % self._type)
-        grid.compute()
-        return grid
+        if not hasattr(self, 'grid__'):
+            grid = None
+            if self._type == Grid.GRID_TYPES.quad:
+                grid = QuadGrid(self.polygon, self._n_vertices)
+            elif self._type == Grid.GRID_TYPES.tri:
+                grid = TriGrid(self.polygon, self._n_vertices)
+            else:
+                raise AttributeError("Unknown grid type: %s" % self._type)
+            grid.compute()
+            setattr(self, 'grid__', grid)
+        return getattr(self, 'grid__')
 
+    @property
+    def n_sets(self):
+        return self.grid.n_sets
+
+    def get_points(self, set):
+        if not hasattr(self, 'points__%s' % set):
+            points = self.grid.get_vertices()[set]
+            setattr(self, 'points__%s' % set, Point.sort(points))
+        return getattr(self, 'points__%s' % set)

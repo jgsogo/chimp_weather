@@ -21,11 +21,13 @@ class GridTestCase(TestCase):
         self.assertEqual(instance._type, Grid.GRID_TYPES.quad)
         self.assertEqual(instance.polygon, self.rect1)
         self.assertEqual(instance._n_vertices, self.n_vertices)
+        self.assertEqual(instance.n_sets, 2)
 
         instance2 = Grid.objects.create_from_grid(self.tri)
         self.assertEqual(instance2._type, Grid.GRID_TYPES.tri)
         self.assertEqual(instance2.polygon, self.rect1)
         self.assertEqual(instance2._n_vertices, self.n_vertices)
+        self.assertEqual(instance2.n_sets, 3)
 
     def test_polygon_property(self):
         instance = Grid.objects.create_from_grid(self.quad)
