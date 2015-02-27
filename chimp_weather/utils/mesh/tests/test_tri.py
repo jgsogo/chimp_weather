@@ -6,10 +6,10 @@ import unittest
 import random
 import math
 
-from chimp_weather.utils.mesh.hex import HexGrid
+from chimp_weather.utils.mesh.tri import TriGrid
 
 
-class HexGridTestCase(unittest.TestCase):
+class TriGridTestCase(unittest.TestCase):
     def setUp(self):
         from chimp_weather.utils.mesh.polygon import Rectangle
         self.square1 = Rectangle(0, 0, 5.5, 3*math.sqrt(3)/2.)
@@ -17,14 +17,14 @@ class HexGridTestCase(unittest.TestCase):
 
     def test_init(self):
         n_vertices = random.randint(4, 1000)
-        grid = HexGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
 
         self.assertEqual(self.square1, grid.polygon)
         self.assertEqual(n_vertices, grid._n_vertices)
         self.assertEqual(self.n_sets, grid.n_sets)
 
     def test_compute(self):
-        grid = HexGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
         grid.compute()
         self.assertEqual(grid.nx, 6)
         self.assertEqual(grid.ny, 4)
@@ -33,14 +33,14 @@ class HexGridTestCase(unittest.TestCase):
     def test_compute_rand(self):
         for i in xrange(100):
             n_vertices = random.randint(4, 1000)
-            grid = HexGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
+            grid = TriGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
             grid.compute()
 
             self.assertLessEqual(grid.n_vertices, n_vertices)
             self.assertLessEqual(grid.coverage, 1.05)
 
     def test_grid_vertices(self):
-        grid = HexGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
         grid.compute()
 
         # Pertenecen al grid
@@ -51,7 +51,7 @@ class HexGridTestCase(unittest.TestCase):
                 self.assertEqual(grid.is_grid_vertex(p[0], p[1]), True, "Failed with point %s" % str(p))
 
     def test_non_grid_vertices(self):
-        grid = HexGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=24, n_sets=self.n_sets)
         grid.compute()
 
         # No pertenecen al grid
@@ -66,7 +66,7 @@ class HexGridTestCase(unittest.TestCase):
 
     def test_neighbours(self):
         n_vertices = 24
-        grid = HexGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
+        grid = TriGrid(polygon=self.square1, n_vertices=n_vertices, n_sets=self.n_sets)
         grid.compute()
 
         for i in xrange(100):

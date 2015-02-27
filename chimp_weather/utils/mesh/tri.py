@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class HexGrid(Grid):
+class TriGrid(Grid):
     def _compute(self):
         """
         Calcula la cuadrícula HEXAGONAL que mejor se adapta al polígono introducido como parámetro y que tiene un número de
@@ -135,11 +135,11 @@ def run_tests(verbosity=10):
     print("\n\n")
 
     print(u"===========================")
-    print(u"Running tests for 'hex.py'")
+    print(u"Running tests for 'tri.py'")
     print(u"===========================")
 
     import unittest
-    testsuite = unittest.TestLoader().loadTestsFromName('tests.test_hex')
+    testsuite = unittest.TestLoader().loadTestsFromName('tests.test_tri')
     unittest.TextTestRunner(verbosity=verbosity).run(testsuite)
 
 
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     n_vertices = 1000
     n_sets = 3
-    grid = HexGrid(polygon=s1, n_vertices=n_vertices, n_sets=n_sets)
+    grid = TriGrid(polygon=s1, n_vertices=n_vertices, n_sets=n_sets)
     grid.compute()
 
     print("\tn_x = %s" % grid.nx)
