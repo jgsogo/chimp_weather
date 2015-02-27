@@ -1,25 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from chimp_weather.utils.mesh.point import Point
+
 import logging
 log = logging.getLogger(__name__)
-
-
-class Point(object):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return self.__unicode__()
-
-    def __unicode__(self):
-        return u"(%s, %s)" % (self.x, self.y)
-
-    def __eq__(self, other):
-        if isinstance(other, Point):
-            return self.x == other.x and self.y == other.y
-        return NotImplemented
 
 
 def orientation(p, q, r):

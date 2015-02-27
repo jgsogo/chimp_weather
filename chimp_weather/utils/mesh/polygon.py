@@ -36,38 +36,37 @@ class Polygon(object):
             sides.append((first, second))
 
         for pair in itertools.product(sides, repeat=2):
-            p1 = Point(*pair[0][0])
-            q1 = Point(*pair[0][1])
-            p2 = Point(*pair[1][0])
-            q2 = Point(*pair[1][1])
+            p1 = pair[0][0]
+            q1 = pair[0][1]
+            p2 = pair[1][0]
+            q2 = pair[1][1]
             if not p1==p2 or not q1==q2:
                 if do_intersect(p1, q1, p2, q2, same_is_intersection=False):
-                    print p1, q1, p2, q2
                     raise ValueError("Segments intersects")
         return True
 
     @property
     def min_x(self):
         if not hasattr(self, '_min_x'):
-            setattr(self, '_min_x', min([p[0] for p in self.points]))
+            setattr(self, '_min_x', min([p.x for p in self.points]))
         return getattr(self, '_min_x')
 
     @property
     def min_y(self):
         if not hasattr(self, '_min_y'):
-            setattr(self, '_min_y', min([p[1] for p in self.points]))
+            setattr(self, '_min_y', min([p.y for p in self.points]))
         return getattr(self, '_min_y')
 
     @property
     def max_x(self):
         if not hasattr(self, '_max_x'):
-            setattr(self, '_max_x', max([p[0] for p in self.points]))
+            setattr(self, '_max_x', max([p.x for p in self.points]))
         return getattr(self, '_max_x')
 
     @property
     def max_y(self):
         if not hasattr(self, '_max_y'):
-            setattr(self, '_max_y', max([p[1] for p in self.points]))
+            setattr(self, '_max_y', max([p.y for p in self.points]))
         return getattr(self, '_max_y')
 
     @property
@@ -86,16 +85,16 @@ class Polygon(object):
 
     @classmethod
     def serialize(cls, points):
-        return u";".join([u"%s,%s" % (p[0], p[1]) for p in points])
+        return u";".join([u"%s,%s" % (p.x, p.y) for p in points])
 
     @classmethod
     def deserialize(cls, string):
-        return [tuple(map(float, it.split(u","))) for it in string.split(u";")]
+        return [Point(*map(float, it.split(u","))) for it in string.split(u";")]
 
 
 class Rectangle(Polygon):
     def __init__(self, x, y, width, height):
-        points = [(x,y), (x+width, y), (x+width, y+height), (x, y+height)]
+        points = [Point(x,y), Point(x+width, y), Point(x+width, y+height), Point(x, y+height)]
         super(Rectangle, self).__init__(points)
 
     def get_area(self):
