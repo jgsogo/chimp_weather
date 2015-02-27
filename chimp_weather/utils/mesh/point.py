@@ -20,13 +20,14 @@ class Point(object):
 
     @classmethod
     def sort(cls, points):
-        return sorted(points, cmp=point_order)
-
-
-def point_order(lhs, rhs):
-    if lhs.x == rhs.x:
-        return lhs.y - rhs.y
-    return lhs.x - rhs.x
+        class PointOrder(object):
+            def __init__(self, obj, *args):
+                self.obj = obj
+            def __lt__(self, other):
+                if self.obj.x == other.obj.x:
+                    return self.obj.y < other.obj.y
+                return self.obj.x < other.obj.x
+        return sorted(points, key=PointOrder)
 
 
 def run_tests(verbosity=10):

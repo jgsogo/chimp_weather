@@ -33,7 +33,6 @@ class PointTestCase(unittest.TestCase):
 
         points = [p2, p3, p1]
         ordered = Point.sort(points)
-
         self.assertEqual(len(ordered), 3)
         self.assertEqual(ordered[0], p1)
         self.assertEqual(ordered[1], p2)
