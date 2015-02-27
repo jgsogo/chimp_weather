@@ -20,10 +20,25 @@ class Point(object):
 
     @classmethod
     def sort(cls, points):
-        return sorted(points, key=point_order)
+        return sorted(points, cmp=point_order)
 
 
 def point_order(lhs, rhs):
     if lhs.x == rhs.x:
         return lhs.y - rhs.y
     return lhs.x - rhs.x
+
+
+def run_tests(verbosity=10):
+    print(u"===========================")
+    print(u"Running tests for 'point.py'")
+    print(u"===========================")
+
+    import unittest
+    testsuite = unittest.TestLoader().loadTestsFromName('tests.test_point')
+    unittest.TextTestRunner(verbosity=verbosity).run(testsuite)
+
+
+if __name__ == "__main__":
+    # Run tests
+    run_tests()

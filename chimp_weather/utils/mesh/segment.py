@@ -111,6 +111,10 @@ def do_intersect(p1, q1, p2, q2, same_is_intersection=True):
 
 
 def run_tests(verbosity=10):
+    from chimp_weather.utils.mesh.point import run_tests as point_tests
+    point_tests(verbosity)
+    print("\n\n")
+
     print(u"===========================")
     print(u"Running tests for 'segment.py'")
     print(u"===========================")

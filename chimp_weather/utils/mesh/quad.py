@@ -48,9 +48,9 @@ class QuadGrid(Grid):
         vertices = [[],[]]
         for yy in xrange(self.ny):
             i = 0
-            y_coord = round(s1.min_y + yy*self.side, self.float_digits)
+            y_coord = round(self.polygon.min_y + yy*self.side, self.float_digits)
             for xx in xrange(self.nx):
-                vertices[(j + i)%self.n_sets].append( Point(round(s1.min_x + xx*self.side, self.float_digits), y_coord))
+                vertices[(j + i)%self.n_sets].append( Point(round(self.polygon.min_x + xx*self.side, self.float_digits), y_coord))
                 i += 1
             j += self.n_sets-1
         return vertices
