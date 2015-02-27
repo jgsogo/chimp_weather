@@ -19,6 +19,11 @@ class Polygon(object):
         Polygon._check_integrity(points)
         self.points = points
 
+    def __eq__(self, other):
+        if isinstance(other, Polygon):
+            return self.points == other.points
+        return NotImplemented
+
     @classmethod
     def _check_integrity(cls, points):
         # 1. Ningún punto puede estar repetido
@@ -78,6 +83,14 @@ class Polygon(object):
 
     def is_inside(self, px, py):
         raise NotImplementedError()
+
+    @classmethod
+    def serialize(cls, points):
+        return u";".join([u"%s,%s" % (p[0], p[1]) for p in points])
+
+    @classmethod
+    def deserialize(cls, string):
+        return [tuple(map(float, it.split(u","))) for it in string.split(u";")]
 
 
 class Rectangle(Polygon):

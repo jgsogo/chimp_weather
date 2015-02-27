@@ -43,3 +43,7 @@ class PolygonTestCase(unittest.TestCase):
         self.assertEqual(p.max_x, 15)
         self.assertEqual(p.min_y, -1)
         self.assertEqual(p.max_y, 20)
+
+    def test_serialization(self):
+        points = [(0,0), (-10.1325,0.0), (15.23, -1), (0.15, -0.20)]
+        self.assertEqual(points, Polygon.deserialize(Polygon.serialize(points)))

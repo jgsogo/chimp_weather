@@ -20,10 +20,10 @@ class Observation(models.Model):
     latitude = models.FloatField()
 
     # current vs forecast
-    #_time = models.IntegerField(help_text=_(u'The UNIX time (that is, seconds since midnight GMT on 1 Jan 1970) at which this data point occurs'))
+    #_time = test_models.IntegerField(help_text=_(u'The UNIX time (that is, seconds since midnight GMT on 1 Jan 1970) at which this data point occurs'))
     time = models.DateTimeField(help_text=_(u'Time for the observation'))
     observed = models.DateTimeField(help_text=_(u'When the observation was taken (call to API)'))
-    _non_forecast = models.BooleanField()
+    _non_forecast = models.BooleanField(default=None)
 
     # data-point
     temperature = models.FloatField(_(u'temperature (ºC)'), default=0)

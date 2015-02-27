@@ -17,6 +17,11 @@ class Grid(object):
         # Con los decimales que tenemos, este epsilon es despreciable
         self.epsilon = pow(10, -self.float_digits-1)
 
+    def __eq__(self, other):
+        if type(self) is type(other):
+            return self.polygon == other.polygon and self._n_vertices == other._n_vertices and self.n_sets == other.n_sets
+        return NotImplemented
+
     def _compute(self):
         raise NotImplementedError()
 
@@ -76,7 +81,7 @@ def run_tests(verbosity=10):
     print(u"===========================")
 
     #import unittest
-    #testsuite = unittest.TestLoader().loadTestsFromName('tests.test_polygon')
+    #testsuite = unittest.TestLoader().loadTestsFromName('tests.test_grid')
     #unittest.TextTestRunner(verbosity=verbosity).run(testsuite)
 
 
